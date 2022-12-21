@@ -1,0 +1,65 @@
+
+version: 2
+
+models:
+  - name: listings_csv
+    description: "Lista das acomodações, últimos comentários, preço hoje, resumo das avaliações, etc."
+    columns:
+      - name: id
+        description: "Chave primária da tabela"
+        tests:
+          - unique
+          - not_null
+
+#  - name: reviews_lang
+#    description: "reviews das listings"
+#    columns:
+#      - name: id
+#        description: "The primary key for this table"
+#        tests:
+#          - unique
+#          - not_null
+#      - name: listings_id
+#        tests:
+#        - not_null
+#        - relationships:
+#            to: ref('listings_csv')
+#            field: listings_id
+  
+  - name: calndar0_csv
+    description: "Lista da disponibilidade e também dos valores por dia"
+    columns:
+      - name: listing_id
+        description: "Chave filha da tabela listings_csv"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('listings_csv')
+              field: listing_id
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - listings_id
+            - date
+    #constraints:
+    #  unique:
+    #    -listing_id, to_date(date,'yyyy-mm-dd')
+
+  - name: review_csv
+    description: "Listagem de avaliações dos hóspedes"
+    columns:
+      - name: id
+        description: "chave primária da tabela"
+        tests:
+          - unique
+          - not_null
+
+      - name: listing_id
+        description: "Chave filha da tabela listings_csv"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('listings_csv')
+              field: listing_id
+
+

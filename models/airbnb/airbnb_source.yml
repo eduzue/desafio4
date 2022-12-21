@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: airbnb_source
+    tables:
+      - name: s_covid
+      - name: s_calendar_csv
+        freshness: null
+      - name: s_listings_csv
+      - name: s_review_csv

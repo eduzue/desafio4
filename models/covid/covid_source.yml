@@ -1,0 +1,6 @@
+version: 2
+
+sources:
+  - name: covid_source
+    tables:
+      - name: s_covid

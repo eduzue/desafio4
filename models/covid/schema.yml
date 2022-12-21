@@ -1,0 +1,33 @@
+
+version: 2
+
+models:
+  - name: covid_rj
+    description: "Tabela de notificações, e evolução dos dados sobre síndromes gripais. Faz uma validação e um filtro na tabela de covid bruta, tirando os dados que não contém notificações"
+    columns:
+      - name: source_id
+        description: "Chave primária"
+        tests:
+          - unique
+          - not_null
+
+      #- name: classificacaoFinal
+      #  description: "Tipo de classificação da doença"
+      #  tests:
+      #    - accepted_values:
+      #        values: ['Confirmado por Critério Clínico','Confirmado Clínico-Epidemiológico','Confirmado Laboratorial','Síndrome Gripal Não Especificada','Confirmado Clínico-Imagem','Descartado']
+  - name: s_covid
+    description: "Tabela de notificações, e evolução dos dados sobre síndromes gripais. Faz uma validação e um filtro na tabela de covid bruta, tirando os dados que não contém notificações"
+    columns:
+      - name: source_id
+        description: "Chave primária"
+        tests:
+          - unique
+          - not_null
+
+      - name: classificacaoFinal
+        description: "Tipo de classificação da doença"
+        tests:
+          - accepted_values:
+              values: ['Confirmado por Critério Clínico','Confirmado Clínico-Epidemiológico','Confirmado Laboratorial','Síndrome Gripal Não Especificada','Confirmado Clínico-Imagem','Descartado']
+          
