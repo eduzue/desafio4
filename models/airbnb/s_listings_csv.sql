@@ -27,5 +27,10 @@ select  id as id,
         minimum_nights,
         maximum_nights,
         review_scores_rating,
-        amenities
+        amenities,
+        host_location,
+        calculated_host_listings_count,
+        calculated_host_listings_count_entire_homes,
+        calculated_host_listings_count_private_rooms,
+        calculated_host_listings_count_shared_rooms
 from listings_csv;

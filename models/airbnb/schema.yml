@@ -3,29 +3,56 @@ version: 2
 
 models:
   - name: listings_csv
-    description: "Lista das acomodações, últimos comentários, preço hoje, resumo das avaliações, etc."
+    description: "Lista das acomodações, últimos comentários, preço hoje, resumo das avaliações, etc. Já é um datawarehouse"
     columns:
       - name: id
         description: "Chave primária da tabela"
         tests:
           - unique
           - not_null
-
-#  - name: reviews_lang
-#    description: "reviews das listings"
-#    columns:
-#      - name: id
-#        description: "The primary key for this table"
-#        tests:
-#          - unique
-#          - not_null
-#      - name: listings_id
-#        tests:
-#        - not_null
-#        - relationships:
-#            to: ref('listings_csv')
-#            field: listings_id
+      - name: name
+        description: "Nome para identificação da propriedade"
+      - name: price
+        description: "Preço da estadia resumido, pois em calendar há o valor por dia."
+      - name: host_listings_count
+        description: "Contagem de propriedades para o host"
+      - name: city
+        description: "Cidade da propriedade a ser alugada"
+      - name: zipcode
+        description: "CEP da propriedade"
+      - name: property_type
+        description: "Tipo da propriedade (Apartamento, casa, Loft, etc.)"
+      - name: room_type
+        description: "Tipo de acomodação (Quarto privado, todo o lugar, etc.)"
+      - name: cleaning_fee
+        description: "Taxa de limpeza, uma vez ao final"
   
+  #Silver
+  - name: s_listings_csv
+    description: "Lista das acomodações, últimos comentários, preço hoje, resumo das avaliações, etc. Já é um datawarehouse, somente alteradas as colunas para tratar datas e preço"
+    columns:
+      - name: id
+        description: "Chave primária da tabela"
+        tests:
+          - unique
+          - not_null
+      - name: name
+        description: "Nome para identificação da propriedade"
+      - name: price
+        description: "Preço da estadia resumido, pois em calendar há o valor por dia."
+      - name: host_listings_count
+        description: "Contagem de propriedades para o host"
+      - name: city
+        description: "Cidade da propriedade a ser alugada"
+      - name: zipcode
+        description: "CEP da propriedade"
+      - name: property_type
+        description: "Tipo da propriedade (Apartamento, casa, Loft, etc.)"
+      - name: room_type
+        description: "Tipo de acomodação (Quarto privado, todo o lugar, etc.)"
+      - name: cleaning_fee
+        description: "Taxa de limpeza, uma vez ao final"
+
   - name: calndar0_csv
     description: "Lista da disponibilidade e também dos valores por dia"
     columns:
@@ -36,14 +63,37 @@ models:
           - relationships:
               to: ref('listings_csv')
               field: listing_id
+      - name: available
+        description: "Se a data está disponível ou não no apartamento."
+      - name: price
+        description: "Preço na data"
+
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - listings_id
             - date
-    #constraints:
-    #  unique:
-    #    -listing_id, to_date(date,'yyyy-mm-dd')
+
+  #Silver
+  - name: s_calendar_csv
+    description: "Lista da disponibilidade e também dos valores por dia. Tratado os campos para preço e data."
+    columns:
+      - name: listing_id
+        description: "Chave filha da tabela listings_csv"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('listings_csv')
+              field: listing_id
+      - name: id
+        description: "campo gerado pela concatenação de listings_id + - + date"
+        tests:
+          - not null
+          - unique
+      - name: available
+        description: "Se a data está disponível ou não no apartamento."
+      - name: price
+        description: "Preço na data"
 
   - name: review_csv
     description: "Listagem de avaliações dos hóspedes"
@@ -61,5 +111,64 @@ models:
           - relationships:
               to: ref('listings_csv')
               field: listing_id
+  
+  
+  
+  #Silver
+  - name: s_review_csv
+    description: "Listagem de avaliações dos hóspedes, tratada"
+    columns:
+      - name: id
+        description: "chave primária da tabela"
+        tests:
+          - unique
+          - not_null
+
+      - name: listing_id
+        description: "Chave filha da tabela listings_csv"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('listings_csv')
+              field: listing_id
+
+      - name: reviewer_id
+        description: "chave do avaliador, não há tabela mãe"
+
+      - name: date
+        description: "data da disponibilidade e valor"
+        
 
 
+  #Gold
+  - name: g_listings_calendar
+    description: "Lista das acomodações, últimos comentários, preço hoje, resumo das avaliações, etc. Já é um datawarehouse, somente alteradas as colunas para tratar datas e preço
+                  Adiciona informações da tabela calendar (join), em que sumariza a quantidade de diárias"
+    columns:
+      - name: id
+        description: "Chave primária da tabela"
+        tests:
+          - unique
+          - not_null
+      - name: name
+        description: "Nome para identificação da propriedade"
+      - name: price
+        description: "Preço da estadia resumido, pois em calendar há o valor por dia."
+      - name: host_listings_count
+        description: "Contagem de propriedades para o host"
+      - name: city
+        description: "Cidade da propriedade a ser alugada"
+      - name: zipcode
+        description: "CEP da propriedade"
+      - name: property_type
+        description: "Tipo da propriedade (Apartamento, casa, Loft, etc.)"
+      - name: room_type
+        description: "Tipo de acomodação (Quarto privado, todo o lugar, etc.)"
+      - name: cleaning_fee
+        description: "Taxa de limpeza, uma vez ao final"
+      - name: valortotal
+        description: "Campo extraído da tabela calendar, que trata a disponibilidade da propriedade"
+      - name: qtddiarias
+        description: "Quantidade de diarias que não estão disponíveis no calendar"
+      - name: curta_longa_duracao
+        description: "Campo que identifica se o mínimo de noites é maior que 15 dias. Se sim, trata o campo como L, longa duração. Se não, C (curta duração)"

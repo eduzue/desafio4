@@ -1,7 +1,7 @@
 {{ config(materialized='incremental',
           unique_key="id" ,
           incremental_strategy='append' ,
-          enabled=false
+          enabled=true
           ) 
 }}
 
@@ -34,7 +34,7 @@ with dif as
 
 select  listing_id||'-'||date as id,
         listing_id,
-        to_date(date,'yyyy-mm-dd') as data,
+        to_date(date,'yyyy-mm-dd') as datadisp,
         available,
         trim(replace (price,'$','')) as price
 from
